@@ -61,54 +61,10 @@ const prizes = [
   },
 ];
 
-const degrees = [36, 72, 108, 144, 180, 216, 252, 288, 324, 360];
-const probabilities = [4, 15, 10, 15, 7, 15, 7, 10, 10, 7];
-
-const wheelScreen = document.getElementById("wheelScreen");
-const resultScreen = document.getElementById("resultScreen");
-const wheel = document.getElementById("wheel");
-const spinButton = document.getElementById("spinButton");
-const resultTitle = document.getElementById("resultTitle");
-const resultFood = document.getElementById("resultFood");
-const resultBadge = document.getElementById("resultBadge");
-
-let isSpinning = false;
-let currentRotation = 0;
-
-function getSelectedDegree() {
-  const random = Math.random() * 100;
-  let cumulativeWeight = 0;
-
-  for (let i = 0; i < probabilities.length; i += 1) {
-    cumulativeWeight += probabilities[i];
-    if (random <= cumulativeWeight) {
-      return degrees[i];
-    }
-  }
-
-  return degrees[degrees.length - 1];
-}
-
-function getPrizeByRotation(rotation) {
-  const sectorAngle = 360 / prizes.length;
-  const normalizedAngle = (360 - (rotation % 360)) % 360;
-  const winningIndex = Math.floor(normalizedAngle / sectorAngle);
-  return prizes[winningIndex];
-}
-
-function getBadgeByProbability(probability) {
-  if (probability === "База") return "./img/one.webp";
-  if (probability === "Редкость") return "./img/two.webp";
-  if (probability === "Эпик") return "./img/three.webp";
-  if (probability === "Легенда") return "./img/four.webp";
-  return "./img/one.webp";
-}
-
 function createConfetti() {
   const colors = ["#10B981", "#34D399", "#6EE7B7", "#A7F3D0", "#FBBF24", "#F59E0B"];
-  const confettiContainer = document.getElementById("appRoot");
-
-  for (let i = 0; i < 50; i += 1) {
+  const confettiContainer = document.getElementById("prize");
+  for (let i = 0; i < 50; i++) {
     const confetti = document.createElement("div");
     confetti.style.position = "absolute";
     confetti.style.width = "12px";
@@ -118,43 +74,22 @@ function createConfetti() {
     confetti.style.left = Math.random() * 100 + "%";
     confetti.style.top = "-12px";
     confetti.style.pointerEvents = "none";
-    confetti.style.zIndex = "1000";
     confetti.style.animation = `confettiFall ${3 + Math.random() * 2}s ease-out ${Math.random() * 2}s forwards`;
     confettiContainer.appendChild(confetti);
-
     setTimeout(() => {
-      if (confetti.parentNode) confetti.parentNode.removeChild(confetti);
+      if (confetti.parentNode) {
+        confetti.parentNode.removeChild(confetti);
+      }
     }, 5000);
   }
 }
 
-function showResult(prize) {
-  resultTitle.innerHTML = `Ваше бесплатное блюдо: <br> ${prize.name}`;
-  resultFood.src = prize.image;
-  resultBadge.src = getBadgeByProbability(prize.probability);
-
-  wheelScreen.classList.add("hidden");
-  resultScreen.classList.remove("hidden");
-  createConfetti();
-}
-
-function spinWheel() {
-  if (isSpinning) return;
-
-  isSpinning = true;
-  spinButton.disabled = true;
-
-  const selectedDegree = getSelectedDegree();
-  const fullRotations = 360 + selectedDegree;
-  currentRotation += fullRotations;
-  wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-  setTimeout(() => {
-    const prize = getPrizeByRotation(currentRotation);
-    showResult(prize);
-    isSpinning = false;
-    spinButton.disabled = false;
-  }, 6000);
+function getBadgeSrc(probability) {
+  if (probability === "База") return "./img/one.webp";
+  if (probability === "Редкость") return "./img/two.webp";
+  if (probability === "Эпик") return "./img/three.webp";
+  if (probability === "Легенда") return "./img/four.webp";
+  return "./img/one.webp";
 }
 
 const style = document.createElement("style");
@@ -168,4 +103,14 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-spinButton.addEventListener("click", spinWheel);
+document.addEventListener("DOMContentLoaded", () => {
+  createConfetti();
+
+  const params = new URLSearchParams(window.location.search);
+  const prizeId = Number(params.get("prizeId"));
+  const prize = prizes.find((item) => item.id === prizeId) || prizes[5];
+
+  document.querySelector("h2").innerHTML = `Ваше бесплатное блюдо: <br> ${prize.name}`;
+  document.querySelector(".food").src = prize.image;
+  document.querySelector(".badges").src = getBadgeSrc(prize.probability);
+});
