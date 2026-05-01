@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Колесо фортуны</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>Крутите колесо и получите бесплатное блюдо</h1>
+      <p class="subtitle">Нажмите кнопку, чтобы узнать результат</p>
+
+      <section class="wheel-section">
+        <div class="pointer" aria-hidden="true"></div>
+        <div class="wheel-wrapper">
+          <div id="wheel" class="wheel"></div>
+        </div>
+        <button id="spinButton" class="spin-button" type="button">
+          Крутить
+        </button>
+      </section>
+
+      <section id="resultCard" class="result hidden" aria-live="polite">
+        <h2>Ваше блюдо:</h2>
+        <p id="resultDish" class="dish-name"></p>
+        <p id="resultRarity" class="rarity"></p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
